@@ -56,7 +56,7 @@ const pt = {
         'Entendo tanto a criação quanto a parte técnica, o que me permite levar uma ideia da peça até a página e o sistema que a sustentam, sem perder a identidade da marca. Busco uma vaga em design, vídeo ou desenvolvimento.',
       ],
       info: [
-        { k: 'Base', v: 'São Sebastião do Paraíso, MG' },
+        { k: 'Base', v: 'Santo André, SP' },
         { k: 'Formação', v: 'Análise e Desenvolvimento de Sistemas, Fundação Santo André, 2027–2028' },
         { k: 'Idiomas', v: 'Português nativo, inglês avançado' },
       ],
@@ -160,7 +160,7 @@ const en: typeof pt = {
         'I understand both the creative side and the technical side, which lets me take an idea from the asset all the way to the page and the system behind it, without losing the brand’s identity. I’m looking for a role in design, video or development.',
       ],
       info: [
-        { k: 'Based in', v: 'São Sebastião do Paraíso, MG, Brazil' },
+        { k: 'Based in', v: 'Santo André, SP, Brazil' },
         { k: 'Education', v: 'Systems Analysis and Development, Fundação Santo André, 2027–2028' },
         { k: 'Languages', v: 'Portuguese (native), English (advanced)' },
       ],
