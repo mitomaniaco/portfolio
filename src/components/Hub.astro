@@ -1,0 +1,139 @@
+---
+import { Image } from 'astro:assets';
+import { pic } from '../lib/img';
+import { getWork } from '../i18n/work';
+import { ui, type Lang } from '../i18n/ui';
+import SecHead from './SecHead.astro';
+const { lang = 'pt' } = Astro.props as { lang?: Lang };
+const t = ui[lang].sec.hub;
+const { hub } = getWork(lang);
+const facts = t.facts;
+const mods = t.mods;
+---
+<section class="sec" id="sistema" aria-labelledby="h-hub">
+  <div class="wrap">
+    <SecHead n="03" id="h-hub" title={t.title} tag={t.tag} meta={t.meta} lead={t.lead} />
+
+    <dl class="case">
+      {facts.map((f) => <div><dt>{f.k}</dt><dd>{f.v}</dd></div>)}
+    </dl>
+
+    <div class="stage hub" style="--c: var(--hub)">
+      <div class="screens">
+        <div class="pick" role="group" aria-label={t.screens} hidden>
+          {hub.map((h, i) => (
+            <button type="button" aria-pressed={i === 0 ? 'true' : 'false'} data-k={i} data-m={h.mod} data-desc={h.desc}>{h.title}</button>
+          ))}
+        </div>
+        <div class="frame">
+          <span class="cnt tn" data-cnt aria-hidden="true">01 / {String(hub.length).padStart(2, '0')}</span>
+          <i class="bar" aria-hidden="true"><b data-bar></b></i>
+          {hub.map((h, i) => (
+            <Image src={pic(h.file)} alt={t.screenAlt.replace('{t}', h.title)} widths={[800, 1280]} sizes="(max-width: 960px) 92vw, 900px" quality={72} class={i === 0 ? 'on' : ''} hidden={i !== 0} loading="lazy" />
+          ))}
+        </div>
+        <div class="what" aria-live="polite">
+          {hub.map((h, i) => <div class:list={['w', { on: i === 0 }]} data-w><b>{h.title}</b><span>{h.more}</span><ul>{h.tags.map((g) => <li>{g}</li>)}</ul></div>)}
+        </div>
+      </div>
+
+      <div class="side">
+        <h4>{t.modules}</h4>
+        <ul class="mods" data-mods>{mods.map((m, j) => <li data-m={j} class:list={{ ai: m.ai }}><b>{m.t}</b><span>{m.d}</span></li>)}</ul>
+        <p class="fine">{t.fine}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .case { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 clamp(20px, 3vw, 44px); margin-bottom: clamp(28px, 3.4vw, 48px); }
+  .case > div { display: grid; gap: 8px; align-content: start; padding-top: 14px; border-top: 1px solid var(--rule); }
+  .case dt { font-size: var(--t-s); font-weight: 700; }
+  .case dd { color: var(--ink-2); font-size: var(--t-s); line-height: 1.5; text-wrap: pretty; }
+  .hub { padding: clamp(20px, 3vw, 48px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 18rem); gap: clamp(24px, 3vw, 48px) clamp(24px, 4vw, 64px); }
+  .pick { display: none; }
+  .pick button { min-height: 40px; padding: 0 16px; border-radius: 999px; font-size: var(--t-s); font-weight: 600; box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.28); transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 140ms var(--ease); }
+  .pick button:active { transform: scale(0.97); }
+  .pick button[aria-pressed='true'] { background: #fff; color: var(--ink); box-shadow: none; }
+  @media (hover: hover) { .pick button[aria-pressed='false']:hover { box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.7); } }
+  .frame { position: relative; display: grid; border-radius: 12px; overflow: hidden; background: #f4f4f2; box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.7); }
+  .frame :global(img) { grid-area: 1 / 1; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top left; }
+  @media (prefers-reduced-motion: no-preference) { .frame :global(img.on) { animation: swap 260ms ease; } @keyframes swap { from { opacity: 0.4; } } }
+  .cnt { position: absolute; z-index: 2; top: 12px; right: 12px; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: rgb(17 17 16 / 0.72); color: #fff; }
+  .bar { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; height: 4px; background: rgb(17 17 16 / 0.12); }
+  .bar b { display: block; height: 100%; width: 0; background: var(--live); }
+  .bar b.run { animation: fill 6.2s linear forwards; }
+  @keyframes fill { to { width: 100%; } }
+  .what { display: grid; margin-top: 16px; }
+  .w { grid-area: 1 / 1; display: grid; gap: 6px; align-content: start; opacity: 0; visibility: hidden; transform: translateY(4px); transition: opacity 260ms ease, transform 260ms var(--ease), visibility 0s 260ms; }
+  .w.on { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+  .w b { font-size: var(--t-m, 1.0625rem); font-weight: 700; line-height: 1.35; text-wrap: balance; }
+  .w ul { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .w li { font-size: var(--t-xs); font-weight: 600; padding: 4px 10px; border-radius: 999px; box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.24); }
+  .w span { font-size: var(--t-s); line-height: 1.55; opacity: 0.8; text-wrap: pretty; max-width: 68ch; }
+  .side { display: grid; gap: 12px; align-content: start; }
+  h4 { font-size: var(--t-s); font-weight: 700; margin-bottom: 10px; }
+  .mods { display: grid; }
+  .mods li { position: relative; display: grid; gap: 2px; padding: 10px 0 10px 0; border-bottom: 1px solid rgb(255 255 255 / 0.16); transition: opacity 240ms ease, padding 240ms var(--ease); }
+  .mods li::before { content: ''; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px; border-radius: 3px; background: var(--live); transform: scaleY(0); transition: transform 240ms var(--ease); }
+  .mods li.on { padding-left: 14px; }
+  .mods li.on::before { transform: scaleY(1); }
+  .mods.run li:not(.on) { opacity: 0.5; }
+  .mods li[data-go] { cursor: pointer; }
+  .mods b { font-weight: 700; font-size: var(--t-s); }
+  .mods span { font-size: var(--t-xs); opacity: 0.72; line-height: 1.45; }
+  .mods li.ai b { color: var(--live); }
+  .mods li.ai span { opacity: 0.9; }
+  .fine { opacity: 0.7; font-size: var(--t-xs); }
+  @media (max-width: 960px) {
+    .hub { grid-template-columns: minmax(0, 1fr); }
+    .case { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 24px; }
+    .side { padding-top: 0; }
+    .mods { grid-template-columns: 1fr 1fr; column-gap: 16px; }
+    .pick { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: calc(clamp(20px, 3vw, 48px) * -1); padding-inline: clamp(20px, 3vw, 48px); }
+    .pick button { flex: none; }
+  }
+  @media (max-width: 560px) { .case { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 600px) { .hub { margin-inline: calc(var(--gut) * -0.5); } }
+</style>
+
+<script>
+  const imgs = [...document.querySelectorAll<HTMLImageElement>('#sistema .frame img')];
+  const btns = [...document.querySelectorAll<HTMLButtonElement>('#sistema .pick button')];
+  const mods = [...document.querySelectorAll<HTMLElement>('#sistema [data-m].mods li, #sistema .mods li')];
+  const modsEl = document.querySelector('#sistema [data-mods]')!;
+  const ws = [...document.querySelectorAll<HTMLElement>('#sistema [data-w]')], cnt = document.querySelector('#sistema [data-cnt]')!, bar = document.querySelector<HTMLElement>('#sistema [data-bar]')!;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const withScreen = new Set(btns.map((b) => +b.dataset.m!));
+  mods.forEach((li) => { if (withScreen.has(+li.dataset.m!)) { li.dataset.go = ''; li.tabIndex = 0; li.setAttribute('role', 'button'); li.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); li.click(); } }); } });
+  let cur = 0, timer = 0, paused = false, visible = false, warmed = false;
+  const restartBar = (on: boolean) => { bar.classList.remove('run'); if (on) { void bar.offsetWidth; bar.classList.add('run'); } };
+  const show = (i: number) => {
+    cur = i;
+    btns.forEach((x, k) => x.setAttribute('aria-pressed', String(k === i)));
+    imgs.forEach((im, k) => { im.classList.toggle('on', k === i); im.hidden = k !== i; });
+    ws.forEach((w, k) => w.classList.toggle('on', k === i));
+    cnt.textContent = `${pad(i + 1)} / ${pad(btns.length)}`;
+    mods.forEach((li) => li.classList.toggle('on', +li.dataset.m! === +btns[i].dataset.m!));
+  };
+  // as telas passam sozinhas em laço, acendendo o módulo correspondente; param ao passar o mouse, ao focar ou depois de um clique
+  const stop = () => { clearInterval(timer); timer = 0; restartBar(false); modsEl.classList.remove('run'); };
+  const play = () => {
+    stop();
+    if (paused || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    modsEl.classList.add('run'); restartBar(true);
+    timer = window.setInterval(() => { show((cur + 1) % btns.length); restartBar(true); }, 6200);
+  };
+  const manual = (i: number) => { show(i); paused = true; stop(); restartBar(false); setTimeout(() => { paused = false; if (visible) play(); }, 12000); };
+  btns.forEach((b, i) => b.addEventListener('click', () => manual(i)));
+  mods.forEach((li) => li.addEventListener('click', () => { if (li.dataset.go === undefined) return; const k = btns.findIndex((b) => +b.dataset.m! === +li.dataset.m!); if (k >= 0) manual(k); }));
+  const box = document.querySelector('#sistema .screens')!;
+  box.addEventListener('focusin', stop); box.addEventListener('focusout', () => { if (visible && !paused) play(); });
+  show(0);
+  new IntersectionObserver(([en]) => {
+    visible = en.isIntersecting;
+    if (visible && !warmed) { warmed = true; imgs.forEach((im) => { im.loading = 'eager'; }); }
+    visible ? play() : stop();
+  }, { rootMargin: '200px 0px', threshold: 0.2 }).observe(box);
+</script>

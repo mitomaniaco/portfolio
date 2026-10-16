@@ -1,0 +1,34 @@
+---
+import paths from '../data/brandpaths.json';
+import marks from '../data/brandmarks.json';
+interface Props { name: string }
+const { name } = Astro.props;
+// marcas com glifo oficial (simple-icons) e monogramas no estilo dos ícones de app
+const glyph: Record<string, [string, string]> = {
+  Figma: ['figma', '#F24E1E'], React: ['react', '#149ECA'], Astro: ['astro', '#FF5D01'], 'Node.js': ['nodedotjs', '#5FA04E'],
+  PostgreSQL: ['postgresql', '#4169E1'], Git: ['git', '#F05032'], GitHub: ['github', '#181717'], Claude: ['claude', '#D97757'],
+  ChatGPT: ['openai', '#10A37F'], TypeScript: ['typescript', '#3178C6'],
+};
+// sem logo oficial (conceitos, não marcas): ícone neutro de linha
+const line: Record<string, string> = {
+  SQL: '<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>',
+  REST: '<path d="M8 7 3 12l5 5M16 7l5 5-5 5M14 4l-4 16"/>',
+};
+const mk = (marks as Record<string, string>)[name];
+const g = glyph[name]; const ln = line[name];
+---
+<span class="tm">
+  {mk && <span class="mk" aria-hidden="true" set:html={mk} />}
+  {g && <svg viewBox="0 0 24 24" aria-hidden="true" class="gl" style={`color: ${g[1]}`}><path d={(paths as Record<string, string>)[g[0]]} fill="currentColor" stroke="none" /></svg>}
+  {ln && <svg viewBox="0 0 24 24" aria-hidden="true" class="ln" set:html={ln} />}
+  <span>{name}</span>
+</span>
+
+<style>
+  .tm { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .gl { width: 20px; height: 20px; fill: currentColor; stroke: none; }
+  .mk { display: inline-flex; width: 22px; height: 22px; }
+  .mk :global(svg) { width: 100%; height: 100%; display: block; fill: initial; stroke: none; border-radius: 5px; }
+  .mk :global(path), .mk :global(rect) { stroke: none; }
+  .ln { width: 20px; height: 20px; color: var(--ink-3); stroke-width: 1.7; }
+</style>

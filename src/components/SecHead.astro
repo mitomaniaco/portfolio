@@ -1,0 +1,26 @@
+---
+interface Props { n: string; id: string; title: string; tag: string; meta: string; lead: string }
+import ChapterBar from './ChapterBar.astro';
+const { n, id, title, tag, meta, lead } = Astro.props;
+---
+<header class="sh">
+  <ChapterBar n={n} tag={tag} meta={meta} />
+  <div class="sh-row">
+    <div class="sh-l">
+      <h2 class="disp" id={id}>{title}</h2>
+      <p>{lead}</p>
+    </div>
+    <div class="sh-r"><slot /></div>
+  </div>
+</header>
+
+<style>
+  .sh { margin-bottom: clamp(32px, 3.6vw, 56px); }
+  .sh-row { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 28px clamp(32px, 5vw, 80px); align-items: end; margin-top: clamp(28px, 3vw, 44px); }
+  .sh-l { display: grid; gap: clamp(16px, 1.6vw, 22px); }
+  h2 { font-size: var(--t-h2); }
+  .sh-l p { color: var(--ink-2); font-size: var(--t-l); line-height: 1.42; max-width: 36ch; text-wrap: pretty; }
+  .sh-r { min-width: 0; }
+  .sh-r:empty { display: none; }
+  @media (max-width: 900px) { .sh-row { grid-template-columns: minmax(0, 1fr); } }
+</style>

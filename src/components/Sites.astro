@@ -1,0 +1,95 @@
+---
+import { Image } from 'astro:assets';
+import { pic } from '../lib/img';
+import { getWork } from '../i18n/work';
+import { ui, type Lang } from '../i18n/ui';
+import SecHead from './SecHead.astro';
+const { lang = 'pt' } = Astro.props as { lang?: Lang };
+const t = ui[lang].sec.sites;
+const { sites } = getWork(lang);
+const color: Record<string, string> = { vizu: 'var(--vizu)', nobre: 'var(--metodo)', rdf: 'var(--rdf)' };
+// cor de destaque de cada projeto (bolinhas, setas e rótulos); o fundo do palco usa a cor escura acima
+const dot: Record<string, string> = { vizu: '#13a18c', nobre: '#d6336c', rdf: '#e8801a' };
+---
+<section class="sec alt" id="sites" aria-labelledby="h-sites">
+  <div class="wrap">
+    <SecHead n="02" id="h-sites" title={t.title} tag={t.tag} lead={t.lead}>
+      <ol class="idx">
+        {sites.map((s, i) => (
+          <li style={`--c: ${color[s.id]}; --dot: ${dot[s.id]}`}>
+            <a href={`#site-${s.id}`}><span class="tn">{String(i + 1).padStart(2, '0')}</span><b>{s.name}</b><em>{s.kind}</em><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M5 11l5 5 5-5" /></svg></a>
+          </li>
+        ))}
+      </ol>
+    </SecHead>
+
+    {sites.map((s, i) => (
+      <article class="site" id={`site-${s.id}`} style={`--c: ${color[s.id]}; --dot: ${dot[s.id]}`} aria-labelledby={`h-${s.id}`}>
+        <div class="txt">
+          <p class="no tn"><span>{String(i + 1).padStart(2, '0')}</span> / {String(sites.length).padStart(2, '0')}</p>
+          <h3 class="disp" id={`h-${s.id}`}>{s.name}</h3>
+          <p class="kind">{s.kind}</p>
+          <p class="desc">{s.desc}</p>
+          <dl class="facts">
+            {s.facts.map((f) => <div><dt>{f.k}</dt><dd>{f.v}</dd></div>)}
+          </dl>
+          {s.url
+            ? <a class="pill ink" href={s.url} target="_blank" rel="noopener">{t.open} <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7 5h8v8M15 5 5.5 14.5" /></svg></a>
+            : <p class="private">{t.private}</p>}
+        </div>
+        <div class="stage box">
+          <figure class="browser" tabindex="0" aria-label={t.desktopLabel.replace('{name}', s.name)}>
+            <div class="chrome" aria-hidden="true"><i></i><i></i><i></i><span>{s.host}</span></div>
+            <div class="vp"><Image src={pic(`site-${s.id}-full.webp`)} alt={t.fullAlt.replace('{name}', s.name)} widths={[560, 900]} sizes="(max-width: 960px) 80vw, 720px" quality={68} /></div>
+          </figure>
+          <figure class="mob"><Image src={pic(`site-${s.id}-m.webp`)} alt={t.mobAlt.replace('{name}', s.name)} widths={[200, 380]} sizes="190px" quality={72} /></figure>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
+
+<style>
+  .idx { border-top: 1px solid var(--rule); }
+  .idx a { display: grid; grid-template-columns: 2.25rem minmax(0, auto) minmax(0, 1fr) auto; align-items: center; gap: 14px; min-height: 58px; border-bottom: 1px solid var(--rule); transition: padding 220ms var(--ease); }
+  .idx span { color: var(--ink-3); font-size: var(--t-s); }
+  .idx b { font-weight: 700; font-size: var(--t-l); }
+  .idx em { font-style: normal; color: var(--ink-3); font-size: var(--t-s); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .idx svg { width: 18px; height: 18px; color: var(--dot); }
+  .idx b::before { content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--dot); margin-right: 10px; vertical-align: 0.1em; }
+  @media (hover: hover) { .idx a:hover { padding-left: 8px; } }
+  .site { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(28px, 4vw, 64px); align-items: center; }
+  .site + .site { margin-top: clamp(64px, 7vw, 112px); }
+  .txt { display: grid; gap: 12px; justify-items: start; }
+  .txt h3 { font-size: var(--t-h3); }
+  .kind { font-weight: 700; color: var(--dot); }
+  .no { font-size: var(--t-s); font-weight: 600; color: var(--ink-3); }
+  .no span { color: var(--dot); }
+  .desc { color: var(--ink-2); text-wrap: pretty; }
+  .facts { width: 100%; margin: 8px 0; }
+  .private { color: var(--ink-3); font-size: var(--t-s); }
+  .box { position: relative; padding: clamp(22px, 3vw, 44px) clamp(84px, 14%, 180px) clamp(22px, 3vw, 44px) clamp(22px, 3vw, 44px); }
+  .browser { margin: 0; border-radius: 10px; overflow: hidden; background: #fff; box-shadow: 0 30px 60px -28px rgb(0 0 0 / 0.55); cursor: ns-resize; }
+  .chrome { display: flex; gap: 6px; align-items: center; padding: 10px 12px; border-bottom: 1px solid #eee; font-size: 0.75rem; color: var(--ink-3); }
+  .chrome i { width: 9px; height: 9px; border-radius: 50%; background: #e2e0da; }
+  .chrome span { margin-left: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .vp { aspect-ratio: 16 / 10; overflow: hidden; }
+  .vp :global(img) { width: 100%; transition: transform 900ms var(--ease); }
+  .browser:hover .vp :global(img), .browser:focus-visible .vp :global(img), .browser.run .vp :global(img) { transform: translateY(var(--shift, 0px)); transition: transform 7s cubic-bezier(0.45, 0, 0.55, 1); }
+  .mob { position: absolute; right: clamp(14px, 3%, 40px); bottom: clamp(-30px, -2vw, -14px); width: clamp(96px, 20%, 190px); padding: 5px; border-radius: 24px; background: var(--ink); margin: 0; box-shadow: 0 24px 48px -20px rgb(0 0 0 / 0.6); }
+  .mob :global(img) { border-radius: 19px; width: 100%; }
+  @media (max-width: 960px) { .site { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 600px) { .box { padding: 16px 76px 16px 16px; margin-inline: calc(var(--gut) * -0.5); } }
+  @media (prefers-reduced-motion: reduce) { .vp :global(img) { transition: none !important; } }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.browser').forEach((b) => {
+    const vp = b.querySelector<HTMLElement>('.vp')!;
+    const im = vp.querySelector('img')!;
+    const set = () => b.style.setProperty('--shift', -Math.max(0, im.offsetHeight - vp.offsetHeight) + 'px');
+    im.complete ? set() : im.addEventListener('load', set);
+    addEventListener('resize', set);
+    b.addEventListener('click', () => b.classList.toggle('run'));
+  });
+</script>

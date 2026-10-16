@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from './Hero.astro';
+import Social from './Social.astro';
+import Sites from './Sites.astro';
+import Hub from './Hub.astro';
+import About from './About.astro';
+import Contact from './Contact.astro';
+import type { Lang } from '../i18n/ui';
+const { lang = 'pt' } = Astro.props as { lang?: Lang };
+---
+<Base lang={lang}>
+  <Hero lang={lang} />
+  <main>
+    <Social lang={lang} />
+    <Sites lang={lang} />
+    <Hub lang={lang} />
+    <About lang={lang} />
+  </main>
+  <Contact lang={lang} />
+</Base>

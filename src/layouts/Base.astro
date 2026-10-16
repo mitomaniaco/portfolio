@@ -1,0 +1,85 @@
+---
+import '@fontsource-variable/geist/wght.css';
+import '../styles/global.css';
+import { ui, home, type Lang } from '../i18n/ui';
+interface Props { lang?: Lang }
+const { lang = 'pt' } = Astro.props;
+const t = ui[lang];
+const alt: Lang = lang === 'pt' ? 'en' : 'pt';
+const site = 'https://caioaugusto.vercel.app';
+---
+<!doctype html>
+<html lang={t.htmlLang} data-lang={lang} data-alt={home[alt]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{t.title}</title>
+    <meta name="description" content={t.description} />
+    <meta name="theme-color" content="#f7f6f3" />
+    <meta property="og:title" content={t.title} />
+    <meta property="og:description" content={t.description} />
+    <meta property="og:locale" content={lang === 'pt' ? 'pt_BR' : 'en_US'} />
+    <link rel="alternate" hreflang="pt-BR" href={site + home.pt} />
+    <link rel="alternate" hreflang="en" href={site + home.en} />
+    <link rel="alternate" hreflang="x-default" href={site + home.pt} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline>
+      // ao trocar de idioma, a página nova abre na mesma posição de rolagem
+      (function () {
+        function back() { try { var y = sessionStorage.getItem('ls'); if (y !== null) { sessionStorage.removeItem('ls'); scrollTo(0, +y); } } catch (e) {} }
+        addEventListener('pagereveal', back); document.addEventListener('DOMContentLoaded', back);
+      })();
+    </script>
+    <script is:inline>
+      // idioma: escolha salva > idioma do navegador. A raiz (/) é o português; quem abre /en/ vê inglês.
+      (function () {
+        try {
+          var d = document.documentElement;
+          if (d.dataset.lang !== 'pt' || document.prerendering) return;
+          var s = localStorage.getItem('lang');
+          var nav = ((navigator.languages && navigator.languages[0]) || navigator.language || 'pt').toLowerCase();
+          var want = s || (nav.indexOf('pt') === 0 ? 'pt' : 'en');
+          if (want === 'en') location.replace(d.dataset.alt + location.hash);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <slot />
+    <script is:inline>
+      document.querySelectorAll('[data-lang-toggle]').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+          try { localStorage.setItem('lang', a.getAttribute('data-lang-toggle')); sessionStorage.setItem('ls', String(scrollY)); } catch (x) {}
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+          e.preventDefault();
+          // troca o estado das bandeiras com transição antes de abrir a outra versão
+          var cur = document.querySelector('.fl.on'); if (cur) cur.classList.remove('on'); a.classList.add('on');
+          setTimeout(function () { location.href = a.href; }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 200);
+        });
+      });
+      // deixa a outra versão (idioma) pronta em segundo plano para a troca ser instantânea
+      addEventListener('load', function () {
+        var c = navigator.connection; if (c && (c.saveData || /2g/.test(c.effectiveType || ''))) return;
+        var alt = document.documentElement.dataset.alt; if (!alt) return;
+        setTimeout(function () {
+          if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')) {
+            var s = document.createElement('script'); s.type = 'speculationrules';
+            s.textContent = JSON.stringify({ prerender: [{ source: 'list', urls: [alt], eagerness: 'immediate' }] });
+            document.head.appendChild(s);
+          } else { var l = document.createElement('link'); l.rel = 'prefetch'; l.href = alt; document.head.appendChild(l); }
+        }, 800);
+      });
+      // depois do carregamento inicial, busca em segundo plano as imagens que ficariam para depois
+      addEventListener('load', function () {
+        var c = navigator.connection; if (c && (c.saveData || /2g/.test(c.effectiveType || ''))) return;
+        var q = [].slice.call(document.querySelectorAll('img[loading="lazy"]')).filter(function (i) { return !i.complete; });
+        var n = 0; (function next() { var i = q[n++]; if (!i) return; i.loading = 'eager'; setTimeout(next, 180); })();
+      });
+      if ('IntersectionObserver' in window) {
+        var els = [].slice.call(document.querySelectorAll('.sh-l, .sh-r, .row > header'));
+        var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('rv-in'); io.unobserve(e.target); } }); }, { rootMargin: '0px 0px -8% 0px' });
+        els.forEach(function (el) { if (el.getBoundingClientRect().top > innerHeight * 0.92) { el.classList.add('rv'); io.observe(el); } });
+      }
+    </script>
+  </body>
+</html>

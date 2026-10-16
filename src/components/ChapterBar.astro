@@ -1,0 +1,19 @@
+---
+interface Props { n: string; tag: string; meta?: string; tone?: 'light' | 'dark' }
+const { n, tag, meta, tone = 'light' } = Astro.props;
+---
+<div class:list={['eb', tone]} role="presentation">
+  <span class="n tn">{n}</span>
+  <span class="t">{tag}</span>
+  {meta && <span class="m">{meta}</span>}
+</div>
+
+<style>
+  .eb { display: flex; align-items: baseline; gap: 14px; padding-top: 14px; border-top: 1px solid var(--rule); font-size: var(--t-s); color: var(--ink-3); }
+  .n { font-weight: 600; color: var(--ink); }
+  .t { font-weight: 600; letter-spacing: -0.005em; color: var(--ink); }
+  .m { margin-left: auto; }
+  .dark { border-top-color: rgb(255 255 255 / 0.2); color: rgb(255 255 255 / 0.62); }
+  .dark .n, .dark .t { color: #fff; }
+  @media (max-width: 640px) { .m { display: none; } }
+</style>

@@ -1,0 +1,69 @@
+---
+import ChapterBar from './ChapterBar.astro';
+import { ui, cvFile, type Lang } from '../i18n/ui';
+const { lang = 'pt' } = Astro.props as { lang?: Lang };
+const t = ui[lang].sec.contact;
+const base = [
+  { v: 'caioaugustofrcontato@gmail.com', href: 'mailto:caioaugustofrcontato@gmail.com', copy: 'caioaugustofrcontato@gmail.com' },
+  { v: '(35) 99774-0007', href: 'https://wa.me/5535997740007', ext: true },
+  { v: 'linkedin.com/in/caioaugustofr', href: 'https://www.linkedin.com/in/caioaugustofr', ext: true },
+  { v: lang === 'pt' ? 'curriculo-caio-augusto.pdf' : 'resume-caio-augusto-en.pdf', href: cvFile[lang], dl: true },
+];
+const rows = base.map((r, i) => ({ ...r, ...t.rows[i] }));
+---
+<footer id="contato" aria-labelledby="h-contato">
+  <div class="wrap band">
+    <div class="cbw"><ChapterBar n="05" tag={t.tag} meta={t.meta} tone="dark" /></div>
+  <div class="stage contact" style="--c: var(--ink)">
+    <h2 class="disp" id="h-contato">{t.title}</h2>
+    <p class="sub">{t.sub}</p>
+    <ul class="lines">
+      {rows.map((r) => (
+        <li>
+          <span class="k">{r.k}</span>
+          <a class="v" href={r.href} target={r.ext ? '_blank' : undefined} rel={r.ext ? 'noopener' : undefined} download={r.dl ? '' : undefined}>{r.v}</a>
+          {r.copy
+            ? <button type="button" class="pill o act" data-copy={r.copy} data-copied={t.copied} data-fail={t.copyFail} data-def={t.copy}><span data-label>{r.act}</span></button>
+            : <a class="pill o act" href={r.href} target={r.ext ? '_blank' : undefined} rel={r.ext ? 'noopener' : undefined} download={r.dl ? '' : undefined}>{r.act}</a>}
+        </li>
+      ))}
+    </ul>
+  </div>
+    <div class="foot">
+      <p>{t.foot}</p>
+      <a href="#top">{t.top}</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  footer { scroll-margin-top: 0; }
+  .band { background: var(--ink); color: #fff; box-shadow: 0 0 0 100vmax var(--ink); clip-path: inset(0 -100vmax); }
+  .cbw { padding-top: clamp(56px, 3rem + 4vw, 96px); }
+  .contact { background: transparent; border-radius: 0; padding: clamp(32px, 4vw, 56px) 0 clamp(28px, 4vw, 48px); }
+  h2 { font-size: var(--t-h2); }
+  .sub { margin-top: 18px; max-width: 46ch; opacity: 0.8; font-size: var(--t-l); line-height: 1.4; text-wrap: pretty; }
+  .lines { margin-top: clamp(32px, 4vw, 56px); border-top: 1px solid rgb(255 255 255 / 0.18); }
+  .lines li { display: grid; grid-template-columns: 8rem minmax(0, 1fr) auto; align-items: center; gap: 16px; min-height: 80px; border-bottom: 1px solid rgb(255 255 255 / 0.18); }
+  .k { opacity: 0.65; font-size: var(--t-s); }
+  .v { font-size: var(--t-l); font-weight: 600; overflow-wrap: anywhere; text-underline-offset: 5px; }
+  @media (hover: hover) { .v:hover { text-decoration: underline; } }
+  .act { min-height: 42px; white-space: nowrap; }
+  .foot { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 24px 0 36px; color: rgb(255 255 255 / 0.6); font-size: var(--t-s); border-top: 1px solid rgb(255 255 255 / 0.16); }
+  .foot a { color: #fff; font-weight: 600; }
+  @media (max-width: 640px) {
+    .lines li { grid-template-columns: minmax(0, 1fr); padding-block: 14px; gap: 4px; min-height: 0; }
+    .v { font-size: var(--t-m); overflow-wrap: normal; word-break: normal; }
+    a.act { display: none; }
+    button.act { justify-self: start; margin-top: 6px; min-height: 38px; padding: 0 14px; font-size: var(--t-xs); }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((b) => b.addEventListener('click', async () => {
+    const label = b.querySelector('[data-label]')!;
+    try { await navigator.clipboard.writeText(b.dataset.copy!); label.textContent = b.dataset.copied!; }
+    catch { label.textContent = b.dataset.fail!; }
+    setTimeout(() => (label.textContent = b.dataset.def!), 1800);
+  }));
+</script>

@@ -1,0 +1,212 @@
+---
+import { Image, getImage } from 'astro:assets';
+import { pic } from '../lib/img';
+import { getWork } from '../i18n/work';
+import { ui, type Lang } from '../i18n/ui';
+import SecHead from './SecHead.astro';
+
+const { lang = 'pt' } = Astro.props as { lang?: Lang };
+const t = ui[lang].sec.social;
+const { companies } = getWork(lang);
+
+const full = async (file: string) => (await getImage({ src: pic(file), width: 900, format: 'webp', quality: 72 })).src;
+const short: Record<string, string> = { result: 'Result', maxima: 'Máxima', nobre: 'Nobre', bsa: 'BSA' };
+const cover: Record<string, string> = {
+  result: 'clientes-result-dezembro-semana-1-5-sexta-finalizado-sexta-04.webp',
+  maxima: 'maxima-tecnologias-semana-2-protecao-de-ativos-post.webp',
+  nobre: 'nobre-carrossel-1.webp',
+  bsa: 'clientes-bsa-bones-logo.webp',
+};
+const ratio: Record<string, string> = { result: '4 / 5', maxima: '3 / 4', nobre: '3 / 4', bsa: '4 / 5' };
+
+const data = await Promise.all(companies.map(async (c) => {
+  const items = [
+    ...c.carousels.map((k) => ({ title: k.title, slides: k.slides })),
+    ...c.posts.map((p) => ({ title: p.title, slides: [p.file] })),
+  ];
+  return {
+    ...c,
+    short: short[c.id],
+    total: items.reduce((n, it) => n + it.slides.length, 0),
+    items: await Promise.all(items.map(async (it) => ({ ...it, full: await Promise.all(it.slides.map(full)) }))),
+  };
+}));
+const avatar = Object.fromEntries(await Promise.all(Object.entries(cover).map(async ([k, f]) => [k, (await getImage({ src: pic(f), width: 96, format: 'webp' })).src])));
+const json = data.map((c) => ({ av: avatar[c.id], id: c.id, name: c.name, ar: ratio[c.id], handle: c.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f\s]/g, ''), items: c.items.map((it) => ({ title: it.title, full: it.full })) }));
+---
+<section class="sec" id="social" aria-labelledby="h-social">
+  <div class="wrap">
+    <SecHead n="01" id="h-social" title={t.title} tag={t.tag} lead={t.lead}>
+      <div class="brands" role="tablist" aria-label={t.brandsLabel}>
+        {data.map((c, i) => (
+          <button type="button" role="tab" id={`tab-${c.id}`} aria-controls="brand-panel" aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-co={c.id} style={`--c: var(--${c.id})`}>
+            <span class="ring"><Image src={pic(cover[c.id])} alt="" widths={[96, 192]} sizes="96px" quality={72} /></span>
+            <span class="bn">{c.short}</span>
+          </button>
+        ))}
+      </div>
+    </SecHead>
+
+    <div class="stage band" id="brand-panel" role="tabpanel" aria-labelledby={`tab-${data[0].id}`} style={`--c: var(--${data[0].id})`} data-band>
+      {data.map((c, i) => (
+        <div class="info" data-info={c.id} hidden={i !== 0}>
+          <h3 class="disp">{c.name}</h3>
+          <p class="desc"><b>{c.sector}.</b> {c.desc}</p>
+          <p class="grid-h">{t.pubs}</p>
+          <ul class="pgrid" style={`--ar: ${ratio[c.id]}`}>
+            {c.items.map((it, j) => (
+              <li>
+                <button type="button" data-i={j} aria-pressed={j === 0 ? 'true' : 'false'} aria-label={`${it.title}${it.slides.length > 1 ? `, ${t.carouselOf.replace('{n}', String(it.slides.length))}` : ''}`}>
+                  <Image src={pic(it.slides[0])} alt="" widths={[200, 400]} sizes="(max-width: 960px) 30vw, 200px" quality={68} />
+                  {it.slides.length > 1 && <svg class="stack" viewBox="0 0 18 18" aria-hidden="true"><path d="M5 2h9a2 2 0 0 1 2 2v9h-2V4H5z" /><rect x="2" y="5" width="10" height="11" rx="2" /></svg>}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+
+      <article class="post" aria-label={t.open}>
+        <div class="post-h"><img class="pav" data-pav src={avatar[data[0].id]} alt="" width="32" height="32" /><b data-handle></b><span data-kind></span></div>
+        <div class="slides" data-slides tabindex="0" aria-label={t.slidesLabel}>
+          <div class="track" data-track></div>
+          <span class="cnt tn" data-cnt></span>
+          <button class="arw p" type="button" data-prev aria-label={t.prev}><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5" /></svg></button>
+          <button class="arw n" type="button" data-next aria-label={t.next}><svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5" /></svg></button>
+        </div>
+        <div class="post-f"><div class="dots" data-dots aria-hidden="true"></div><p><b data-handle2></b><span data-title></span></p></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<script is:inline type="application/json" id="social-data" set:html={JSON.stringify({ co: json, t: { slideOf: t.slideOf, kindCar: t.kindCar, kindPost: t.kindPost } })}></script>
+
+<style>
+  .brands { display: flex; justify-content: flex-end; gap: clamp(16px, 2.4vw, 32px); overflow-x: auto; scrollbar-width: none; padding: 4px 2px; }
+  @media (max-width: 900px) { .brands { justify-content: flex-start; } }
+  .brands button { flex: none; display: grid; justify-items: center; gap: 10px; }
+  .ring { width: clamp(76px, 6vw, 96px); aspect-ratio: 1; border-radius: 50%; padding: 4px; box-shadow: inset 0 0 0 2px var(--rule); transition: box-shadow 200ms ease, transform 160ms var(--ease); display: block; }
+  .ring :global(img) { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: top; }
+  .brands button[aria-selected='true'] .ring { box-shadow: inset 0 0 0 3px var(--c); }
+  .brands button:active .ring { transform: scale(0.95); }
+  @media (hover: hover) { .brands button[aria-selected='false']:hover .ring { box-shadow: inset 0 0 0 2px var(--ink-3); } }
+  .bn { display: grid; justify-items: center; font-size: var(--t-s); font-weight: 700; line-height: 1.3; }
+  .bn small { font-weight: 500; color: var(--ink-3); font-size: var(--t-xs); }
+
+  .band { padding: clamp(20px, 3vw, 48px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 460px); gap: clamp(24px, 4vw, 64px); }
+  .info { display: grid; gap: 16px; align-content: start; }
+  .info h3 { font-size: var(--t-h3); }
+  .desc { opacity: 0.88; max-width: 46ch; text-wrap: pretty; }
+  .desc b { font-weight: 700; }
+  .grid-h { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 12px; font-size: var(--t-s); font-weight: 600; border-top: 1px solid rgb(255 255 255 / 0.22); padding-top: 14px; }
+  .grid-h span { opacity: 0.72; font-weight: 500; }
+  .pgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  @media (min-width: 1200px) { .pgrid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .pgrid button { position: relative; display: block; width: 100%; overflow: hidden; border-radius: 8px; transition: opacity 160ms ease, transform 160ms var(--ease); }
+  .pgrid button:active { transform: scale(0.98); }
+  .pgrid :global(img) { width: 100%; aspect-ratio: var(--ar); object-fit: cover; }
+  .stack { position: absolute; top: 7px; right: 7px; width: 18px; height: 18px; fill: #fff; stroke: none; filter: drop-shadow(0 1px 3px rgb(0 0 0 / 0.6)); }
+  .pgrid button[aria-pressed='true']::after { content: ''; position: absolute; inset: 0; box-shadow: inset 0 0 0 3px #fff; border-radius: 8px; }
+  @media (hover: hover) { .pgrid:hover button:not(:hover) { opacity: 0.72; } }
+
+  .post { width: 100%; max-width: 460px; justify-self: end; align-self: start; position: sticky; top: 88px; background: #fff; color: var(--ink); border-radius: 18px; overflow: hidden; box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.5); }
+  .post-h { display: flex; align-items: center; gap: 10px; padding: 12px 14px; font-size: 0.875rem; }
+  .pav { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; object-position: top; box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px var(--c); flex: none; }
+  .post-h b { font-weight: 700; }
+  .post-h span:last-child { margin-left: auto; color: var(--ink-3); font-size: var(--t-xs); }
+  .slides { position: relative; overflow: hidden; touch-action: pan-y; background: var(--paper-2); outline-offset: -3px; }
+  .track { display: flex; transition: transform 420ms var(--ease); }
+  .track :global(img) { flex: none; width: 100%; aspect-ratio: var(--ar, 4 / 5); object-fit: cover; }
+  .arw { position: absolute; top: 50%; translate: 0 -50%; width: 40px; height: 40px; border-radius: 50%; background: rgb(255 255 255 / 0.94); color: var(--ink); display: grid; place-items: center; box-shadow: 0 2px 10px rgb(0 0 0 / 0.2); transition: opacity 160ms ease, transform 140ms var(--ease); }
+  .arw:active { transform: scale(0.92); }
+  .arw:disabled { opacity: 0; pointer-events: none; }
+  .arw.p { left: 10px; } .arw.n { right: 10px; }
+  .arw svg { width: 16px; height: 16px; stroke-width: 2; }
+  .cnt { position: absolute; top: 12px; right: 12px; font-size: 0.75rem; font-weight: 700; padding: 4px 9px; border-radius: 999px; background: rgb(17 17 16 / 0.72); color: #fff; }
+  .post-f { padding: 12px 14px 16px; display: grid; gap: 8px; }
+  .dots { display: flex; justify-content: center; gap: 5px; min-height: 6px; }
+  .dots :global(i) { width: 6px; height: 6px; border-radius: 50%; background: #cfccc5; transition: background-color 160ms ease, transform 160ms ease; }
+  .dots :global(i.on) { background: var(--c); transform: scale(1.15); }
+  .post-f p { font-size: var(--t-s); }
+  .post-f b { font-weight: 700; margin-right: 6px; }
+
+  @media (max-width: 960px) {
+    .band { grid-template-columns: minmax(0, 1fr); }
+    .info:not([hidden]) { display: contents; }
+    .info h3, .desc { order: -3; }
+    .post { position: static; order: -2; justify-self: center; }
+    .grid-h, .pgrid { order: -1; }
+  }
+  @media (max-width: 600px) { .band { margin-inline: calc(var(--gut) * -0.5); } }
+  @media (max-width: 420px) { .brands { gap: 12px; } .ring { width: 70px; } }
+  @media (prefers-reduced-motion: reduce) { .track { transition: none; } }
+</style>
+
+<script>
+  type Item = { title: string; full: string[] };
+  type Co = { av: string; id: string; name: string; ar: string; handle: string; items: Item[] };
+  const parsed = JSON.parse(document.getElementById('social-data')!.textContent!);
+  const BLANK = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+  const data: Co[] = parsed.co; const T = parsed.t;
+  const q = <T extends Element = HTMLElement>(s: string) => document.querySelector<T>(s)!;
+  const tabs = [...document.querySelectorAll<HTMLButtonElement>('.brands [role=tab]')];
+  const band = q('[data-band]'), track = q('[data-track]'), dots = q('[data-dots]'), slides = q('[data-slides]');
+  let co = data[0], cur = 0, at = 0;
+
+  function pick(id: string, focus = false) {
+    const k = data.findIndex((c) => c.id === id); if (k < 0) return;
+    co = data[k];
+    tabs.forEach((t, i) => { t.setAttribute('aria-selected', String(i === k)); t.tabIndex = i === k ? 0 : -1; });
+    if (focus) tabs[k].focus();
+    band.style.setProperty('--c', `var(--${id})`);
+    band.setAttribute('aria-labelledby', `tab-${id}`);
+    document.querySelectorAll<HTMLElement>('[data-info]').forEach((d) => (d.hidden = d.dataset.info !== id));
+    q('[data-handle]').textContent = q('[data-handle2]').textContent = co.handle;
+    q<HTMLImageElement>('[data-pav]').src = co.av;
+    open(0);
+  }
+  const grid = () => [...document.querySelectorAll<HTMLButtonElement>(`[data-info="${co.id}"] .pgrid button`)];
+  function open(i: number) {
+    cur = i; at = 0;
+    const it = co.items[i];
+    grid().forEach((b, k) => b.setAttribute('aria-pressed', String(k === i)));
+    track.style.setProperty('--ar', co.ar);
+    track.innerHTML = it.full.map((f, k) => `<img src="${k > 1 ? BLANK : f}" data-src="${f}" alt="${co.name}, ${it.title}${it.full.length > 1 ? `, ${T.slideOf.replace('{k}', String(k + 1)).replace('{n}', String(it.full.length))}` : ''}" decoding="async">`).join('');
+    dots.innerHTML = it.full.length > 1 ? it.full.map(() => '<i></i>').join('') : '';
+    q('[data-kind]').textContent = it.full.length > 1 ? T.kindCar : T.kindPost;
+    q('[data-title]').textContent = it.title;
+    render();
+  }
+  function render() {
+    const n = co.items[cur].full.length;
+    track.style.transform = `translateX(${-at * 100}%)`;
+    [...track.children].forEach((_, k) => { const im = track.children[k] as HTMLImageElement | undefined; if (im && im.dataset.src && im.src !== im.dataset.src) im.src = im.dataset.src; });
+    [...dots.children].forEach((d, k) => d.classList.toggle('on', k === at));
+    const c = q('[data-cnt]'); c.hidden = n < 2; c.textContent = `${at + 1}/${n}`;
+    q<HTMLButtonElement>('[data-prev]').disabled = at === 0;
+    q<HTMLButtonElement>('[data-next]').disabled = at === n - 1;
+  }
+  const step = (d: number) => { const n = co.items[cur].full.length; if (at + d < 0 || at + d >= n) return; at += d; render(); };
+
+  tabs.forEach((t) => t.addEventListener('click', () => pick(t.dataset.co!)));
+  q('.brands').addEventListener('keydown', (e) => {
+    const k = tabs.indexOf(document.activeElement as HTMLButtonElement); if (k < 0) return;
+    const key = (e as KeyboardEvent).key;
+    const d = key === 'ArrowRight' ? 1 : key === 'ArrowLeft' ? -1 : 0; if (!d) return;
+    e.preventDefault(); pick(data[(k + d + data.length) % data.length].id, true);
+  });
+  document.querySelectorAll('.pgrid').forEach((g) => g.addEventListener('click', (e) => {
+    const b = (e.target as Element).closest<HTMLButtonElement>('button'); if (!b) return;
+    open(+b.dataset.i!);
+    if (matchMedia('(max-width: 960px)').matches) slides.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  }));
+  q('[data-prev]').addEventListener('click', () => step(-1));
+  q('[data-next]').addEventListener('click', () => step(1));
+  slides.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') step(1); if (e.key === 'ArrowLeft') step(-1); });
+  let sx: number | null = null;
+  slides.addEventListener('pointerdown', (e) => { if (!(e.target as Element).closest('button')) sx = e.clientX; });
+  slides.addEventListener('pointerup', (e) => { if (sx != null && Math.abs(e.clientX - sx) > 40) step(e.clientX < sx ? 1 : -1); sx = null; });
+  addEventListener('pick-brand', (e) => pick((e as CustomEvent<string>).detail));
+  pick(data[0].id);
+</script>
