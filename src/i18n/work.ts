@@ -45,11 +45,15 @@ const hubEn = [
   ['CRM', 'A sales funnel in columns, with drag and drop between stages.'],
   ['Lead 360°', 'Everything about a client in one place: conversations, deals, projects and files.'],
   ['Inbox', 'WhatsApp conversations in a WhatsApp Web style, with audio and message templates.'],
+  ['Production', 'A project board per producer, with deadlines, status and priority.'],
+  ['After-sales', 'A client portfolio per agent, with the chat beside each client.'],
   ['Dashboard', 'Leads, sales, deliveries and deadlines at a glance in a single panel.'],
   ['Strategic', 'Internal projects with subtasks, priorities and deadlines.'],
   ['Notes', 'Collaborative notes with real-time presence.'],
   ['Social media', 'Contract control and the post schedule for each client.'],
   ['Team', 'Internal chat, profiles and goals per department.'],
+  ['AI Studio', 'A gallery of AI-generated images, with the prompt, model and author of each.'],
+  ['Script to scenes', 'From script to scenes: batch images, with the narration for each.'],
 ];
 const hubMoreEn: { more: string; tags: string[] }[] = [
   {
@@ -77,6 +81,24 @@ const hubMoreEn: { more: string; tags: string[] }[] = [
       "Message templates",
       "Scheduling",
       "Transfer conversations"
+    ]
+  },
+  {
+    "more": "Each producer has their own board, split into Production, Changes and Finished. The card shows client, deadline, notes and status, and you can prioritize a project or open the client’s tracking page. On the side, the team panel shows how many projects each producer has in each stage, and the Distribute tab receives new projects with the producer suggested by the salesperson and the work’s point value.",
+    "tags": [
+      "Board per producer",
+      "Distribution with suggestion",
+      "Points per project",
+      "Changes kept separate"
+    ]
+  },
+  {
+    "more": "Each after-sales agent sees their own portfolio filtered by status: awaiting the video, in revision, delivered, awaiting payment and completed. Picking a client opens the conversation beside it, with the deal value and the actions to request a revision or record the approval. Leadership assigns new clients to agents through the Distribute tab.",
+    "tags": [
+      "Portfolio per agent",
+      "Filter by status",
+      "Chat beside the client",
+      "Client distribution"
     ]
   },
   {
@@ -120,6 +142,24 @@ const hubMoreEn: { more: string; tags: string[] }[] = [
       "Internal chat",
       "Groups",
       "Role permissions"
+    ]
+  },
+  {
+    "more": "The studio gallery keeps everything the team generates with AI: each image shows the prompt used, the model, the style, the aspect ratio and who created it. You can open an image full screen with all its details and download it. Images stay available for anyone on the team to reuse.",
+    "tags": [
+      "Prompt and model saved",
+      "Ready-made styles",
+      "Author of each image",
+      "Full screen with details"
+    ]
+  },
+  {
+    "more": "The image generator also works from a script: it splits the text into scenes and generates one image for each, storing the narration alongside. With character, scenery and logo references, the scenes keep the same identity from start to finish. This is the flow that cut the prep time of each video from 1h30 to 10 minutes.",
+    "tags": [
+      "Script into scenes",
+      "Narration per scene",
+      "Character references",
+      "Batch generation"
     ]
   }
 ];

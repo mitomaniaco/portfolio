@@ -286,6 +286,22 @@ export const hub = [
     "tags": ["Texto, áudio e arquivos", "Modelos de mensagem", "Agendamento", "Transferir atendimento"]
   },
   {
+    "file": "hub-producao.webp",
+    "title": "Produção",
+    "mod": 2,
+    "desc": "Quadro de projetos por produtor, com prazos, status e prioridade.",
+    "more": "Cada produtor tem o seu quadro, separado em Produção, Alterações e Finalizados. O card mostra cliente, prazo, observações e status, e dá para priorizar um projeto ou abrir a página de acompanhamento do cliente. Na lateral, a equipe mostra quantos projetos cada produtor tem em cada etapa, e a aba Distribuir recebe os projetos novos já com o produtor sugerido pela vendedora e a pontuação do trabalho.",
+    "tags": ["Quadro por produtor", "Distribuição com sugestão", "Pontuação por projeto", "Alterações separadas"]
+  },
+  {
+    "file": "hub-posvenda.webp",
+    "title": "Pós-venda",
+    "mod": 3,
+    "desc": "Carteira de clientes por atendente, com o chat ao lado de cada cliente.",
+    "more": "Cada atendente do pós-venda vê a sua carteira filtrada por situação: aguardando o vídeo, em alteração, entregue, aguardando pagamento e concluído. Ao escolher um cliente, a conversa abre ao lado, com o valor do negócio e as ações de pedir alteração ou registrar a aprovação. A liderança distribui os clientes novos entre os atendentes pela aba Distribuir.",
+    "tags": ["Carteira por atendente", "Filtro por situação", "Chat ao lado do cliente", "Distribuição de clientes"]
+  },
+  {
     "file": "hub-dashboard.webp",
     "title": "Dashboard",
     "mod": 4,
@@ -324,5 +340,21 @@ export const hub = [
     "desc": "Chat interno, perfis e metas por setor.",
     "more": "Os membros do time organizados por setor, com perfil, cargo e status de cada pessoa. O chat interno funciona como o WhatsApp, com conversas diretas, grupos criados pelo administrador e envio de arquivos e áudios. O acesso a cada menu depende do cargo.",
     "tags": ["Perfis por setor", "Chat interno", "Grupos", "Permissões por cargo"]
+  },
+  {
+    "file": "hub-studio.webp",
+    "title": "Studio com IA",
+    "mod": 8,
+    "desc": "Galeria de imagens geradas por IA, com prompt, modelo e autor de cada uma.",
+    "more": "A galeria do estúdio guarda tudo o que o time gera com IA: cada imagem mostra o prompt usado, o modelo, o estilo, a proporção e quem criou. Dá para abrir a imagem em tela cheia com todos os detalhes e baixá-la. As imagens ficam disponíveis para qualquer pessoa do time reaproveitar.",
+    "tags": ["Prompt e modelo salvos", "Estilos prontos", "Autor de cada imagem", "Tela cheia com detalhes"]
+  },
+  {
+    "file": "hub-studio-roteiro.webp",
+    "title": "Roteiro em cenas",
+    "mod": 8,
+    "desc": "Do roteiro às cenas: imagens em lote, com a narração de cada uma.",
+    "more": "O gerador de imagens também trabalha a partir de um roteiro: ele separa o texto em cenas e gera uma imagem para cada uma, guardando a narração junto. Com personagem, cenário e logotipo de referência, as cenas mantêm a mesma identidade do começo ao fim. É esse fluxo que reduziu o preparo de cada vídeo de 1h30 para 10 minutos.",
+    "tags": ["Roteiro em cenas", "Narração por cena", "Referências de personagem", "Geração em lote"]
   }
 ];
